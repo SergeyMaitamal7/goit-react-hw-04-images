@@ -1,39 +1,39 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import { useEffect, useRef } from 'react';
 import { Overlay, ModalForm, Imglarge } from './Modal.styled';
-export class Modal extends Component {
-  static propTypes = {
-    largeUrl: PropTypes.string,
-    onClose: PropTypes.func,
-    onClick: PropTypes.func,
-  };
-  componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
-  }
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
-  }
+export function Modal({ onClose, largeUrl }) {
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
 
-  handleKeyDown = e => {
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const handleKeyDown = e => {
     if (e.code === 'Escape') {
-      this.props.onClose();
+      onClose();
     }
   };
 
-  handleCloseBackdrop = e => {
+  const handleCloseBackdrop = e => {
     if (e.currentTarget === e.target) {
-      this.props.onClose();
+      onClose();
     }
   };
 
-  render() {
-    return (
-      <Overlay onClick={this.handleCloseBackdrop}>
-        <ModalForm>
-          <Imglarge src={this.props.largeUrl} />
-        </ModalForm>
-      </Overlay>
-    );
-  }
+  return (
+    <Overlay onClick={handleCloseBackdrop}>
+      <ModalForm>
+        <Imglarge src={largeUrl} />
+      </ModalForm>
+    </Overlay>
+  );
 }
+
+Modal.propTypes = {
+  largeUrl: PropTypes.string,
+  onClose: PropTypes.func,
+  onClick: PropTypes.func,
+};

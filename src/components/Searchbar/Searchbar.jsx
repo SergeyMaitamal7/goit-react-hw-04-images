@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import PropTypes from 'prop-types';
-import { BsSearch} from 'react-icons/bs';
+import { BsSearch } from 'react-icons/bs';
 import {
   SearchbarForm,
   SearchForm,
@@ -10,54 +10,51 @@ import {
   Input,
 } from './Searchbar.styled';
 
-export class Searchbar extends Component {
-  state = {
-    query: '',
-  };
+export function Searchbar({ submit }) {
+  const [query, setQuery] = useState('');
 
-  static propTypes = {
-    query: PropTypes.string,
-  };
-
-  handleClickChange = e => {
+  const handleClickChange = e => {
     const { value } = e.currentTarget;
-    this.setState({ query: value.toLowerCase() });
+    setQuery(value.toLowerCase());
   };
 
-  handleSubmitForm = e => {
+  const handleSubmitForm = e => {
     e.preventDefault();
-    if (this.state.query.trim()  === '') {
+    if (query.trim() === '') {
       Notify.failure(
         'The search string cannot be empty. Please specify your search query.'
       );
       return;
     }
-    this.props.submit(this.state);
-    this.resetForm();
+    submit({ query });
+    resetForm();
   };
 
-  resetForm = e => {
-    this.setState({ query: '' });
+  const resetForm = e => {
+    setQuery('');
   };
-
-  render() {
-    return (
-      <SearchbarForm>
-        <SearchForm onSubmit={this.handleSubmitForm}>
-          <SearchFormButton type="submit"> <BsSearch size="2rem" color="black"/>
-            <ButtonLabel>Search</ButtonLabel>
-          </SearchFormButton>
-          <Input
-            onChange={this.handleClickChange}
-            name="input"
-            value={this.state.query}
-            type="text"
-            autocomplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-          />
-        </SearchForm>
-      </SearchbarForm>
-    );
-  }
+  return (
+    <SearchbarForm>
+      <SearchForm onSubmit={handleSubmitForm}>
+        <SearchFormButton type="submit">
+          {' '}
+          <BsSearch size="2rem" color="black" />
+          <ButtonLabel>Search</ButtonLabel>
+        </SearchFormButton>
+        <Input
+          onChange={handleClickChange}
+          name="input"
+          value={query}
+          type="text"
+          autocomplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+        />
+      </SearchForm>
+    </SearchbarForm>
+  );
 }
+
+Searchbar.propTypes = {
+  query: PropTypes.string,
+};

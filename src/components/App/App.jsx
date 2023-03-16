@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { apiImages } from 'api/Api';
 import { Searchbar } from 'components/Searchbar/Searchbar';
@@ -9,35 +9,25 @@ import { Button } from 'components/Button/Button';
 import { Container } from './App.styled';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-export class App extends Component {
-  state = {
-    query: '',
-    page: 1,
-    perPage: 12,
-    arrayImg: [],
-    showModal: false,
-    largeUrl: null,
-    loader: false,
-    showBtn: false,
-  };
+export function App() {
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(12);
+  const [arrayImg, setArrayImg] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [largeUrl, setLargeUrl] = useState(null);
+  const [loader, setLoader] = useState(false);
+  const [showBtn, setShowBtn] = useState(false);
 
-  static propTypes = {
-    query: PropTypes.string,
-    page: PropTypes.number,
-    perPage: PropTypes.bool,
-    arrayImg: PropTypes.array,
-    shouModal: PropTypes.bool,
-    largeUrl: PropTypes.string,
-    loader: PropTypes.bool,
-  };
+  useEffect(() => {
+    if (query === '') {
+      return;
+    }
 
-  async componentDidUpdate(prevProps, prevState) {
-    const { query, page, perPage } = this.state;
-    if (prevState.page !== page || prevState.query !== query) {
+    asyncFetch();
+    async function asyncFetch() {
       try {
-        this.setState({
-          loader: true,
-        });
+        setLoader(true);
         const { hits, totalHits } = await apiImages(query, page, perPage);
         if (totalHits === 0) {
           Notify.failure(
@@ -45,63 +35,57 @@ export class App extends Component {
           );
           return;
         }
-        this.setState(({ arrayImg }) => ({
-          arrayImg: [...arrayImg, ...hits],
-          showBtn: page < Math.ceil(totalHits / 12),
-        }));
+        setArrayImg([...arrayImg, ...hits]);
+        setShowBtn(page < Math.ceil(totalHits / 12));
       } catch (error) {
         console.log(error);
       } finally {
-        this.setState({
-          loader: false,
-        });
+        setLoader(false);
         return;
       }
     }
-  }
+  }, [arrayImg, page, perPage, query]);
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({ showModal: !showModal }));
+  const toggleModal = () => {
+    setShowModal(!showModal);
   };
 
-  handleLargeImage = image => {
-    this.setState({ largeUrl: image.largeImageURL, showModal: true });
+  const handleLargeImage = image => {
+    setLargeUrl(image.largeImageURL);
+    setShowModal(true);
   };
 
-  handleSubmit = ({ query }) => {
-    this.setState({
-      query: query,
-      page: 1,
-      arrayImg: [],
-      showBtn: false,
-    });
+  const handleSubmit = ({ query }) => {
+    console.log(query);
+    setQuery(query);
+    setPage(1);
+    setArrayImg([]);
+    setShowBtn(false);
   };
 
-  handleButtonLoadMore = () => {
-    this.setState(({ page }) => ({
-      page: page + 1,
-    }));
+  const handleButtonLoadMore = () => {
+    setPage(page + 1);
   };
 
-  render() {
-    const { arrayImg, showModal, largeUrl, loader, showBtn } = this.state;
-    return (
-      <Container>
-        <Searchbar submit={this.handleSubmit}></Searchbar>
-        {arrayImg && (
-          <ImageGallery
-            images={arrayImg}
-            сlick={this.handleLargeImage}
-          ></ImageGallery>
-        )}
-        {showBtn && (
-          <Button onLoadMore={this.handleButtonLoadMore}>Load more</Button>
-        )}
-        {showModal && (
-          <Modal onClose={this.toggleModal} largeUrl={largeUrl}></Modal>
-        )}
-        {loader && <Loader></Loader>}
-      </Container>
-    );
-  }
+  return (
+    <Container>
+      <Searchbar submit={handleSubmit}></Searchbar>
+      {arrayImg && (
+        <ImageGallery images={arrayImg} сlick={handleLargeImage}></ImageGallery>
+      )}
+      {showBtn && <Button onLoadMore={handleButtonLoadMore}>Load more</Button>}
+      {showModal && <Modal onClose={toggleModal} largeUrl={largeUrl}></Modal>}
+      {loader && <Loader></Loader>}
+    </Container>
+  );
 }
+
+App.propTypes = {
+  query: PropTypes.string,
+  page: PropTypes.number,
+  perPage: PropTypes.bool,
+  arrayImg: PropTypes.array,
+  shouModal: PropTypes.bool,
+  largeUrl: PropTypes.string,
+  loader: PropTypes.bool,
+};
