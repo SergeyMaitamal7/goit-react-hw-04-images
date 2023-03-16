@@ -33,7 +33,7 @@ export function App() {
           );
           return;
         }
-        setArrayImg(prevState => [...prevState, ...hits]);
+        setArrayImg([...arrayImg, ...hits]);
         setShowBtn(page < Math.ceil(totalHits / 12));
       } catch (error) {
         console.log(error);
