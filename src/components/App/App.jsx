@@ -23,7 +23,6 @@ export function App() {
     if (query === '') {
       return;
     }
-    asyncFetch();
     async function asyncFetch() {
       try {
         setLoader(true);
@@ -43,7 +42,8 @@ export function App() {
         return;
       }
     }
-  }, [arrayImg, page, perPage, query]);
+    asyncFetch();
+  }, [page, query]);
 
   const toggleModal = () => {
     setShowModal(!showModal);
