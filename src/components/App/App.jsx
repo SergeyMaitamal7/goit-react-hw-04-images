@@ -42,8 +42,8 @@ export function App() {
         return;
       }
     }
-    asyncFetch();
-  }, [page, query]);
+       asyncFetch();
+  }, [page, perPage, query]);
 
   const toggleModal = () => {
     setShowModal(!showModal);
