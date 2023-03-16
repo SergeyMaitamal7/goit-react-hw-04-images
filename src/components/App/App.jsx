@@ -23,7 +23,6 @@ export function App() {
     if (query === '') {
       return;
     }
-
     asyncFetch();
     async function asyncFetch() {
       try {

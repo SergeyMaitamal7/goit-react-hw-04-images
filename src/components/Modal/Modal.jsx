@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useEffect, useRef } from 'react';
+import { useEffect} from 'react';
 import { Overlay, ModalForm, Imglarge } from './Modal.styled';
 
 export function Modal({ onClose, largeUrl }) {
