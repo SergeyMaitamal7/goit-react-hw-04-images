@@ -33,7 +33,7 @@ export function App() {
           );
           return;
         }
-        setArrayImg([...arrayImg, ...hits]);
+        setArrayImg(prevState => [...prevState, ...hits]);
         setShowBtn(page < Math.ceil(totalHits / 12));
       } catch (error) {
         console.log(error);
@@ -42,7 +42,7 @@ export function App() {
         return;
       }
     }
-       asyncFetch();
+    asyncFetch();
   }, [page, perPage, query]);
 
   const toggleModal = () => {
@@ -54,12 +54,15 @@ export function App() {
     setShowModal(true);
   };
 
-  const handleSubmit = ({ query }) => {
-    console.log(query);
-    setQuery(query);
-    setPage(1);
-    setArrayImg([]);
-    setShowBtn(false);
+  const handleSubmit = newQuery => {
+    if (query === newQuery.query) {
+      Notify.failure('we find it already, change search query');
+    } else {
+      setQuery(newQuery.query);
+      setPage(1);
+      setArrayImg([]);
+      setShowBtn(false);
+    }
   };
 
   const handleButtonLoadMore = () => {
