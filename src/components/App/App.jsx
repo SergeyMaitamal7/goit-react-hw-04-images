@@ -12,7 +12,6 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 export function App() {
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(12);
   const [arrayImg, setArrayImg] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [largeUrl, setLargeUrl] = useState(null);
@@ -26,14 +25,14 @@ export function App() {
     async function asyncFetch() {
       try {
         setLoader(true);
-        const { hits, totalHits } = await apiImages(query, page, perPage);
+        const { hits, totalHits } = await apiImages(query, page);
         if (totalHits === 0) {
           Notify.failure(
             'Sorry, there are no images matching your search query. Please try again.'
           );
           return;
         }
-        setArrayImg([...arrayImg, ...hits]);
+        setArrayImg(prevState => [...prevState, ...hits]);
         setShowBtn(page < Math.ceil(totalHits / 12));
       } catch (error) {
         console.log(error);
@@ -43,7 +42,7 @@ export function App() {
       }
     }
     asyncFetch();
-  }, [page, perPage, query]);
+  }, [page, query]);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -66,7 +65,7 @@ export function App() {
   };
 
   const handleButtonLoadMore = () => {
-    setPage(page + 1);
+    setPage(prevState => prevState + 1);
   };
 
   return (
